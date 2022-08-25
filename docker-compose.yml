@@ -1,0 +1,79 @@
+version: "3.7"
+
+services:
+    app:
+        build:
+            args:
+                user: sammy
+                uid: 1000
+            context: .
+            dockerfile: Dockerfile
+        image: jane-app
+        container_name: jane-app
+        restart: unless-stopped
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www
+        networks:
+            - jane
+        depends_on:
+            - redis
+            - db
+
+    queue:
+        image: jane-app
+        container_name: jane-queue
+        restart: always
+        command: ['/bin/sh', '-c', 'php artisan queue:work']
+        depends_on:
+            - app
+        volumes:
+            - ./:/var/www
+        networks:
+            - jane
+
+    redis:
+        container_name: jane-redis
+        image: redis:7.0
+        volumes:
+            - redis:/data
+        networks:
+            - jane
+
+    db:
+        image: mariadb:latest
+        container_name: jane-db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_USER: ${DB_USERNAME}
+        volumes:
+            - ./docker/mysql:/var/lib/mysql
+        networks:
+            - jane
+
+    nginx:
+        image: nginx:alpine
+        container_name: jane-nginx
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx:/etc/nginx/conf.d
+        networks:
+            - jane
+        depends_on:
+            - app
+
+volumes:
+    redis:
+        name: jane-redis-data
+        driver: "local"
+
+networks:
+    jane:
+        name: jane-net
+        driver: bridge
