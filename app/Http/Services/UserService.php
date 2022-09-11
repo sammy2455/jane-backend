@@ -23,7 +23,7 @@ class UserService
             throw new HttpResponseException(response()->json([
                 'success' => true,
                 'message' => 'The user could not be registered, please try again later.',
-            ]));
+            ], 500));
         }
 
         return $user;

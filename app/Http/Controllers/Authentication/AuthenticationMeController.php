@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\User;
+use App\Http\Resources\UserResource;
 use App\Http\Services\AuthService;
 
 class AuthenticationMeController extends Controller
@@ -17,6 +17,6 @@ class AuthenticationMeController extends Controller
 
     public function __invoke()
     {
-        return new User($this->authService->getAuthenticatedUser());
+        return new UserResource($this->authService->getAuthenticatedUser());
     }
 }

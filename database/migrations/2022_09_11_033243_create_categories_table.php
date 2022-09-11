@@ -14,8 +14,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->integer('category_id')->nullable(false)->autoIncrement();
+            $table->string('name', 30)->nullable(false);
+            $table->integer('created_by')->nullable(false);
+            $table->dateTime('updated_at')->nullable()->useCurrentOnUpdate();
+            $table->dateTime('created_at')->nullable()->useCurrent();
+            $table->softDeletes();
         });
     }
 

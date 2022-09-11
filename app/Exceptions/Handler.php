@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Psr\Log\LogLevel;
 use Throwable;
 
@@ -49,11 +50,18 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (Throwable $e) {
-            $status = $e->getStatusCode() ? $e->getStatusCode() : 500;
+
+            if ($e instanceof HttpResponseException) {
+                $status = $e->getResponse()->getStatusCode();
+                $message = json_decode($e->getResponse()->getContent())->message;
+            } else {
+                $status = 500;
+                $message = $e->getMessage();
+            }
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => $message,
             ], $status);
         });
     }
