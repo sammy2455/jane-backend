@@ -5,6 +5,11 @@ use App\Http\Controllers\Authentication\AuthenticationLogoutController;
 use App\Http\Controllers\Authentication\AuthenticationMeController;
 use App\Http\Controllers\Authentication\AuthenticationRefreshController;
 use App\Http\Controllers\Authentication\AuthenticationSignupController;
+use App\Http\Controllers\Categories\CategoryDestroyController;
+use App\Http\Controllers\Categories\CategoryIndexController;
+use App\Http\Controllers\Categories\CategoryShowController;
+use App\Http\Controllers\Categories\CategoryStoreController;
+use App\Http\Controllers\Categories\CategoryUpdateController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +33,12 @@ Route::group(['prefix' => 'v1'], function ($router) {
         Route::post('/me', AuthenticationMeController::class)->middleware('jwt.verify')->name('me');
     });
 
-
+    Route::group(['prefix' => 'categories'], function ($router) {
+        Route::get('/', CategoryIndexController::class)->middleware('jwt.verify');
+        Route::post('/', CategoryStoreController::class)->middleware('jwt.verify');
+        Route::get('/{category}', CategoryShowController::class)->middleware('jwt.verify');
+        Route::put('/{category}', CategoryUpdateController::class)->middleware('jwt.verify');
+        Route::delete('/{category}', CategoryDestroyController::class)->middleware('jwt.verify');
+    });
 
 });
